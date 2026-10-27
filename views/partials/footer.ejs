@@ -1,0 +1,91 @@
+    </main>
+
+    <!-- Luxury Brand Footer -->
+    <footer class="bg-zinc-950 text-zinc-400 border-t border-zinc-900 mt-20 pt-16 pb-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-zinc-800/80">
+                
+                <!-- Brand Manifesto -->
+                <div class="lg:col-span-2">
+                    <span class="luxury-serif text-2xl font-bold tracking-[0.25em] text-white uppercase block mb-3">
+                        SCATCH
+                    </span>
+                    <p class="text-xs text-zinc-400 leading-relaxed max-w-sm mb-6">
+                        An artisanal atelier dedicated to the pursuit of exceptional leathercraft. Hand-cut and saddle-stitched for a lifetime of distinguished journeys.
+                    </p>
+                    <div class="flex items-center gap-3">
+                        <a href="#" class="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300 hover:text-white hover:border-zinc-700 transition-colors">
+                            <i class="ri-instagram-line text-sm"></i>
+                        </a>
+                        <a href="#" class="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300 hover:text-white hover:border-zinc-700 transition-colors">
+                            <i class="ri-pinterest-line text-sm"></i>
+                        </a>
+                        <a href="#" class="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300 hover:text-white hover:border-zinc-700 transition-colors">
+                            <i class="ri-twitter-x-line text-sm"></i>
+                        </a>
+                        <a href="#" class="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300 hover:text-white hover:border-zinc-700 transition-colors">
+                            <i class="ri-youtube-line text-sm"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Collections -->
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-white mb-4">Collections</h4>
+                    <ul class="space-y-2.5 text-xs">
+                        <li><a href="/shop?category=Tote+Bags" class="hover:text-white transition-colors">Italian Totes</a></li>
+                        <li><a href="/shop?category=Backpacks" class="hover:text-white transition-colors">Ballistic Backpacks</a></li>
+                        <li><a href="/shop?category=Crossbody" class="hover:text-white transition-colors">Heritage Crossbody</a></li>
+                        <li><a href="/shop?category=Travel+Duffles" class="hover:text-white transition-colors">48H Travel Duffles</a></li>
+                        <li><a href="/shop?category=Briefcases" class="hover:text-white transition-colors">Executive Briefcases</a></li>
+                        <li><a href="/shop?category=Clutches" class="hover:text-white transition-colors">Evening Clutches</a></li>
+                    </ul>
+                </div>
+
+                <!-- Customer Care -->
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-white mb-4">Client Services</h4>
+                    <ul class="space-y-2.5 text-xs">
+                        <li><a href="/my-orders" class="hover:text-white transition-colors">Order Tracking</a></li>
+                        <li><a href="/cart" class="hover:text-white transition-colors">Shopping Bag</a></li>
+                        <li><a href="/wishlist" class="hover:text-white transition-colors">Wishlist</a></li>
+                        <li><a href="/account" class="hover:text-white transition-colors">Account Settings</a></li>
+                        <li><a href="/owners/login" class="hover:text-white transition-colors">Atelier Staff / Admin</a></li>
+                    </ul>
+                </div>
+
+                <!-- Newsletter Subscription -->
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-white mb-4">Privé Circle</h4>
+                    <p class="text-xs text-zinc-400 mb-3 leading-relaxed">
+                        Join our private ledger for previews of limited-run leather editions.
+                    </p>
+                    <form onsubmit="event.preventDefault(); alert('Thank you for subscribing to Scatch Privé.');" class="space-y-2">
+                        <input 
+                            type="email" 
+                            required 
+                            placeholder="Enter your email" 
+                            class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-white placeholder:text-zinc-500 focus:outline-none focus:border-amber-400 transition-colors"
+                        >
+                        <button type="submit" class="w-full bg-white text-zinc-950 font-bold text-xs py-2 rounded-lg hover:bg-zinc-200 transition-colors">
+                            Request Invitation
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+
+            <!-- Bottom Copyright & Badges -->
+            <div class="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
+                <p>&copy; <%= new Date().getFullYear() %> SCATCH Atelier Inc. All rights reserved. Handcrafted with obsession.</p>
+                <div class="flex items-center gap-6">
+                    <span class="flex items-center gap-1.5"><i class="ri-shield-check-line text-zinc-400"></i> Lifetime Warranty</span>
+                    <span class="flex items-center gap-1.5"><i class="ri-truck-line text-zinc-400"></i> Worldwide Delivery</span>
+                    <span class="flex items-center gap-1.5"><i class="ri-lock-line text-zinc-400"></i> Encrypted Checkout</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

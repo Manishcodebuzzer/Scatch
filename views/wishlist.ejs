@@ -1,0 +1,109 @@
+<%- include('./partials/header') %>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    
+    <div class="flex items-center justify-between pb-6 border-b border-zinc-200 mb-8">
+        <div>
+            <span class="text-xs font-bold uppercase tracking-widest text-amber-600 block mb-1">
+                Personal Sanctuary
+            </span>
+            <h1 class="luxury-serif text-3xl font-extrabold text-zinc-900 tracking-tight">
+                Saved Wishlist
+            </h1>
+        </div>
+        <a href="/shop" class="text-xs font-bold text-zinc-600 hover:text-black flex items-center gap-1">
+            <i class="ri-arrow-left-line"></i> Browse Catalog
+        </a>
+    </div>
+
+    <% if (wishlistItems && wishlistItems.length > 0) { %>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <% wishlistItems.forEach(function(product) { %>
+                <% 
+                   if (!product) return;
+                   const finalPrice = Math.max(0, product.price - (product.discount || 0));
+                   const panelBg = product.panelcolor || product.panecolor || '#18181b';
+                   const textColor = product.textcolor || '#ffffff';
+                   const bgBackdrop = product.bgcolor || '#f4f4f5';
+                %>
+
+                <div class="group relative flex flex-col rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-zinc-200 bg-white">
+                    
+                    <!-- Remove from Wishlist Button -->
+                    <a 
+                        href="/wishlist/toggle/<%= product._id %>" 
+                        title="Remove from Wishlist"
+                        class="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white text-rose-600 shadow-md flex items-center justify-center hover:scale-110 transition-transform"
+                    >
+                        <i class="ri-heart-3-fill text-lg"></i>
+                    </a>
+
+                    <!-- Canvas Thumbnail -->
+                    <div class="relative w-full h-56 flex items-center justify-center p-6" style="background-color: <%= bgBackdrop %>;">
+                        <a href="/products/<%= product._id %>" class="w-full h-full flex items-center justify-center">
+                            <% if (product.image && product.image.length > 0) { %>
+                                <% 
+                                   let isSvg = product.image.toString('utf8').trim().startsWith('<svg');
+                                   let mime = isSvg ? 'image/svg+xml' : 'image/jpeg';
+                                %>
+                                <img 
+                                    class="max-h-40 max-w-full object-contain filter drop-shadow group-hover:scale-105 transition-transform" 
+                                    src="data:<%= mime %>;base64,<%= product.image.toString('base64') %>" 
+                                    alt="<%= product.name %>"
+                                >
+                            <% } %>
+                        </a>
+                    </div>
+
+                    <!-- Panel & Actions -->
+                    <div class="p-5 flex flex-col justify-between flex-grow" style="background-color: <%= panelBg %>; color: <%= textColor %>;">
+                        <div>
+                            <span class="text-[10px] font-bold uppercase tracking-wider opacity-75 block mb-1">
+                                <%= product.category %>
+                            </span>
+                            <a href="/products/<%= product._id %>" class="hover:underline">
+                                <h3 class="font-bold text-sm tracking-tight line-clamp-1 mb-2">
+                                    <%= product.name %>
+                                </h3>
+                            </a>
+                            <div class="flex items-baseline gap-2 mb-3">
+                                <span class="text-base font-extrabold">₹ <%= finalPrice.toLocaleString('en-IN') %></span>
+                                <% if (product.discount && product.discount > 0) { %>
+                                    <span class="text-xs line-through opacity-60">₹ <%= product.price.toLocaleString('en-IN') %></span>
+                                <% } %>
+                            </div>
+                        </div>
+
+                        <!-- Move to Bag Button -->
+                        <a 
+                            href="/cart/add/<%= product._id %>?redirect=cart" 
+                            class="w-full bg-white text-zinc-950 hover:bg-amber-400 font-bold text-xs py-2.5 rounded-xl uppercase tracking-wider flex items-center justify-center gap-2 transition-colors shadow-sm"
+                        >
+                            <i class="ri-shopping-bag-line text-sm"></i>
+                            Move to Bag
+                        </a>
+                    </div>
+
+                </div>
+            <% }) %>
+        </div>
+    <% } else { %>
+        <!-- Empty Wishlist -->
+        <div class="py-24 text-center max-w-md mx-auto">
+            <div class="w-24 h-24 bg-zinc-100 rounded-full flex items-center justify-center mx-auto text-zinc-400 mb-6">
+                <i class="ri-heart-3-line text-5xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-zinc-900 mb-2">No Saved Pieces Yet</h2>
+            <p class="text-xs sm:text-sm text-zinc-500 mb-8 leading-relaxed">
+                Save your cherished leather bags here while exploring our atelier collections.
+            </p>
+            <a href="/shop" class="inline-flex items-center gap-2 px-8 py-3.5 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-lg transition-all">
+                <span>Discover Creations</span>
+                <i class="ri-arrow-right-line"></i>
+            </a>
+        </div>
+    <% } %>
+
+</div>
+
+<%- include('./partials/footer') %>

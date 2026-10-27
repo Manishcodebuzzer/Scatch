@@ -1,0 +1,562 @@
+<%- include('./partials/header') %>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    
+    <!-- Admin Top Bar -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-8 border-b border-zinc-200">
+        <div>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-xs font-bold uppercase tracking-widest text-emerald-800">
+                    Live Atelier Control Center
+                </span>
+            </div>
+            <h1 class="luxury-serif text-3xl font-extrabold text-zinc-900 tracking-tight">
+                Store Operations & Catalog Management
+            </h1>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <a 
+                href="/owners/seed" 
+                title="Populate demo luxury bags"
+                class="px-4 py-2.5 rounded-xl border border-zinc-300 hover:border-zinc-900 bg-white text-zinc-800 text-xs font-bold transition-all shadow-sm flex items-center gap-1.5"
+            >
+                <i class="ri-database-2-line text-amber-600"></i>
+                Load Sample Catalog
+            </a>
+            <a 
+                href="/shop" 
+                target="_blank"
+                class="px-4 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5"
+            >
+                <i class="ri-external-link-line"></i>
+                View Client Boutique
+            </a>
+            <a 
+                href="/owners/logout" 
+                class="px-3.5 py-2.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold transition-all"
+                title="Exit Admin Suite"
+            >
+                <i class="ri-logout-box-r-line"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- KPI Metric Cards (Real DB Analytics) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 my-8">
+        <div class="p-6 bg-white rounded-3xl border border-zinc-200 shadow-sm space-y-1">
+            <div class="flex items-center justify-between text-zinc-400">
+                <span class="text-xs uppercase font-bold tracking-wider">Gross Sales</span>
+                <i class="ri-money-dollar-circle-line text-xl text-amber-600"></i>
+            </div>
+            <p class="text-2xl font-black text-zinc-900">₹ <%= stats.totalRevenue.toLocaleString('en-IN') %></p>
+            <span class="text-[10px] text-emerald-600 font-bold flex items-center gap-0.5">
+                <i class="ri-arrow-up-line"></i> Verified settlements
+            </span>
+        </div>
+
+        <div class="p-6 bg-white rounded-3xl border border-zinc-200 shadow-sm space-y-1">
+            <div class="flex items-center justify-between text-zinc-400">
+                <span class="text-xs uppercase font-bold tracking-wider">Client Orders</span>
+                <i class="ri-shopping-cart-2-line text-xl text-amber-600"></i>
+            </div>
+            <p class="text-2xl font-black text-zinc-900"><%= stats.totalOrders %></p>
+            <span class="text-[10px] text-zinc-500 font-semibold">Across all collections</span>
+        </div>
+
+        <div class="p-6 bg-white rounded-3xl border border-zinc-200 shadow-sm space-y-1">
+            <div class="flex items-center justify-between text-zinc-400">
+                <span class="text-xs uppercase font-bold tracking-wider">Catalog Pieces</span>
+                <i class="ri-handbag-line text-xl text-amber-600"></i>
+            </div>
+            <p class="text-2xl font-black text-zinc-900"><%= stats.totalProducts %></p>
+            <span class="text-[10px] text-zinc-500 font-semibold">Live in boutique</span>
+        </div>
+
+        <div class="p-6 bg-white rounded-3xl border border-zinc-200 shadow-sm space-y-1">
+            <div class="flex items-center justify-between text-zinc-400">
+                <span class="text-xs uppercase font-bold tracking-wider">Registered Clients</span>
+                <i class="ri-user-star-line text-xl text-amber-600"></i>
+            </div>
+            <p class="text-2xl font-black text-zinc-900"><%= stats.totalCustomers %></p>
+            <span class="text-[10px] text-zinc-500 font-semibold">Privé membership</span>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="flex items-center gap-3 border-b border-zinc-200 pb-4 mb-8">
+        <button 
+            onclick="switchAdminTab('products')" 
+            id="tab-btn-products"
+            class="px-5 py-2.5 rounded-full text-xs font-bold transition-all <%= typeof tab === 'undefined' || tab === 'products' || tab === 'overview' ? 'bg-zinc-900 text-white shadow-md' : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200' %>"
+        >
+            <i class="ri-grid-fill mr-1.5"></i> Products Catalog (<%= products.length %>)
+        </button>
+
+        <button 
+            onclick="switchAdminTab('create')" 
+            id="tab-btn-create"
+            class="px-5 py-2.5 rounded-full text-xs font-bold transition-all <%= typeof tab !== 'undefined' && tab === 'create' ? 'bg-zinc-900 text-white shadow-md' : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200' %>"
+        >
+            <i class="ri-add-circle-fill mr-1.5 text-amber-400"></i> Create New Product
+        </button>
+
+        <button 
+            onclick="switchAdminTab('orders')" 
+            id="tab-btn-orders"
+            class="px-5 py-2.5 rounded-full text-xs font-bold transition-all <%= typeof tab !== 'undefined' && tab === 'orders' ? 'bg-zinc-900 text-white shadow-md' : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200' %>"
+        >
+            <i class="ri-file-list-3-fill mr-1.5"></i> Customer Orders (<%= orders.length %>)
+        </button>
+    </div>
+
+    <!-- TAB 1: Products Catalog Table -->
+    <div id="admin-tab-products" class="<%= typeof tab !== 'undefined' && (tab === 'create' || tab === 'orders') ? 'hidden' : '' %> space-y-6">
+        
+        <div class="bg-white rounded-3xl border border-zinc-200 shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-zinc-100 flex items-center justify-between">
+                <div>
+                    <h2 class="text-base font-bold text-zinc-900">Active Bag Catalog</h2>
+                    <p class="text-xs text-zinc-500">Live products currently available to customers in the boutique.</p>
+                </div>
+                <button onclick="switchAdminTab('create')" class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl shadow-sm">
+                    + Add Bag
+                </button>
+            </div>
+
+            <% if (products && products.length > 0) { %>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-zinc-50 text-zinc-500 uppercase tracking-wider text-[10px] border-b border-zinc-200">
+                            <tr>
+                                <th class="p-4 pl-6">Product</th>
+                                <th class="p-4">Category</th>
+                                <th class="p-4">Price / Discount</th>
+                                <th class="p-4">Net Price</th>
+                                <th class="p-4">Stock</th>
+                                <th class="p-4">Palette</th>
+                                <th class="p-4 pr-6 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-zinc-100 font-medium">
+                            <% products.forEach(function(product) { %>
+                                <% 
+                                   const finalPrice = Math.max(0, product.price - (product.discount || 0));
+                                   const panelBg = product.panelcolor || product.panecolor || '#18181b';
+                                   const bgBackdrop = product.bgcolor || '#f4f4f5';
+                                %>
+                                <tr class="hover:bg-zinc-50/80 transition-colors">
+                                    <td class="p-4 pl-6">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-12 h-12 rounded-xl flex items-center justify-center p-1 border border-zinc-200" style="background-color: <%= bgBackdrop %>;">
+                                                <% if (product.image && product.image.length > 0) { %>
+                                                    <% 
+                                                       let isSvg = product.image.toString('utf8').trim().startsWith('<svg');
+                                                       let mime = isSvg ? 'image/svg+xml' : 'image/jpeg';
+                                                    %>
+                                                    <img class="max-h-10 max-w-full object-contain" src="data:<%= mime %>;base64,<%= product.image.toString('base64') %>" alt="">
+                                                <% } %>
+                                            </div>
+                                            <div>
+                                                <a href="/products/<%= product._id %>" class="font-bold text-zinc-900 hover:underline">
+                                                    <%= product.name %>
+                                                </a>
+                                                <span class="text-[10px] text-zinc-400 block truncate max-w-xs"><%= product.description %></span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="p-4 text-zinc-600 font-semibold"><%= product.category %></td>
+                                    <td class="p-4 text-zinc-600">
+                                        <span>₹ <%= product.price.toLocaleString('en-IN') %></span>
+                                        <% if (product.discount > 0) { %>
+                                            <span class="text-rose-600 text-[11px] block">- ₹ <%= product.discount.toLocaleString('en-IN') %></span>
+                                        <% } %>
+                                    </td>
+                                    <td class="p-4 font-black text-zinc-900">₹ <%= finalPrice.toLocaleString('en-IN') %></td>
+                                    <td class="p-4">
+                                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold <%= product.stock > 5 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800' %>">
+                                            <%= product.stock %> in stock
+                                        </span>
+                                    </td>
+                                    <td class="p-4">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="w-4 h-4 rounded-full border border-black/20" style="background-color: <%= bgBackdrop %>;" title="Backdrop"></span>
+                                            <span class="w-4 h-4 rounded-full border border-black/20" style="background-color: <%= panelBg %>;" title="Panel"></span>
+                                        </div>
+                                    </td>
+                                    <td class="p-4 pr-6 text-right">
+                                        <a 
+                                            href="/products/delete/<%= product._id %>" 
+                                            onclick="return confirm('Delete this product permanently?')"
+                                            class="w-8 h-8 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 inline-flex items-center justify-center transition-colors"
+                                            title="Delete product"
+                                        >
+                                            <i class="ri-delete-bin-line"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } else { %>
+                <div class="p-12 text-center text-zinc-400 text-xs">
+                    No products in catalog. Click "Load Sample Catalog" or create one below.
+                </div>
+            <% } %>
+        </div>
+
+    </div>
+
+    <!-- TAB 2: Interactive Create Product Form with Real-Time Card Preview -->
+    <div id="admin-tab-create" class="<%= typeof tab === 'undefined' || tab !== 'create' ? 'hidden' : '' %> space-y-6">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+            
+            <!-- Left: Creation Form -->
+            <div class="lg:col-span-7 bg-white rounded-3xl p-8 border border-zinc-200 shadow-sm space-y-6">
+                <div>
+                    <h2 class="text-lg font-bold text-zinc-900">Create New Luxury Piece</h2>
+                    <p class="text-xs text-zinc-500">Specify details, pricing, categories, and custom color palette.</p>
+                </div>
+
+                <form action="/products/create" method="POST" enctype="multipart/form-data" class="space-y-5">
+                    
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-700 mb-1">Product Title</label>
+                        <input 
+                            type="text" 
+                            name="name" 
+                            id="input-name"
+                            required 
+                            placeholder="e.g. Sovereign Italian Leather Duffle" 
+                            oninput="updatePreview()"
+                            class="w-full bg-zinc-50 border border-zinc-300 focus:border-zinc-900 rounded-xl px-4 py-3 text-xs text-zinc-900 focus:outline-none"
+                        >
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-zinc-700 mb-1">Base Price (₹)</label>
+                            <input 
+                                type="number" 
+                                name="price" 
+                                id="input-price"
+                                required 
+                                placeholder="4999" 
+                                oninput="updatePreview()"
+                                class="w-full bg-zinc-50 border border-zinc-300 focus:border-zinc-900 rounded-xl px-4 py-3 text-xs text-zinc-900 focus:outline-none"
+                            >
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-zinc-700 mb-1">Discount (₹)</label>
+                            <input 
+                                type="number" 
+                                name="discount" 
+                                id="input-discount"
+                                placeholder="500" 
+                                oninput="updatePreview()"
+                                class="w-full bg-zinc-50 border border-zinc-300 focus:border-zinc-900 rounded-xl px-4 py-3 text-xs text-zinc-900 focus:outline-none"
+                            >
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-zinc-700 mb-1">Stock Count</label>
+                            <input 
+                                type="number" 
+                                name="stock" 
+                                placeholder="15" 
+                                value="15"
+                                class="w-full bg-zinc-50 border border-zinc-300 focus:border-zinc-900 rounded-xl px-4 py-3 text-xs text-zinc-900 focus:outline-none"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-zinc-700 mb-1">Collection / Category</label>
+                            <select 
+                                name="category" 
+                                id="input-category"
+                                onchange="updatePreview()"
+                                class="w-full bg-zinc-50 border border-zinc-300 focus:border-zinc-900 rounded-xl px-4 py-3 text-xs text-zinc-900 focus:outline-none font-semibold cursor-pointer"
+                            >
+                                <option value="Tote Bags">Tote Bags</option>
+                                <option value="Backpacks">Backpacks</option>
+                                <option value="Crossbody">Crossbody</option>
+                                <option value="Travel Duffles">Travel Duffles</option>
+                                <option value="Briefcases">Briefcases</option>
+                                <option value="Clutches">Evening Clutches</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-zinc-700 mb-1">Bag Image Upload</label>
+                            <input 
+                                type="file" 
+                                name="image" 
+                                accept="image/*"
+                                class="w-full bg-zinc-50 border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-600 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-zinc-900 file:text-white"
+                            >
+                            <span class="text-[10px] text-zinc-400 mt-1 block">Optional: If empty, a signature vector bag will be generated automatically.</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-700 mb-1">Atelier Description</label>
+                        <textarea 
+                            name="description" 
+                            rows="3" 
+                            placeholder="Hand-stitched in Florence with full-grain Tuscan hides..."
+                            class="w-full bg-zinc-50 border border-zinc-300 focus:border-zinc-900 rounded-xl p-3 text-xs text-zinc-900 focus:outline-none"
+                        ></textarea>
+                    </div>
+
+                    <!-- Signature Palette Controls -->
+                    <div class="p-5 rounded-2xl bg-zinc-50 border border-zinc-200 space-y-3">
+                        <span class="text-xs font-bold text-zinc-900 uppercase tracking-wider block">Signature Palette</span>
+                        <div class="grid grid-cols-3 gap-3">
+                            <div>
+                                <label class="block text-[11px] font-semibold text-zinc-600 mb-1">Canvas Backdrop</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="color" id="picker-bgcolor" value="#f4f4f5" oninput="syncColor('bgcolor', this.value)" class="w-8 h-8 rounded-lg cursor-pointer border border-zinc-300">
+                                    <input type="text" name="bgcolor" id="input-bgcolor" value="#f4f4f5" oninput="syncPicker('bgcolor', this.value)" class="w-full bg-white border border-zinc-300 rounded-lg px-2 py-1.5 text-xs text-zinc-800">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-zinc-600 mb-1">Panel Color</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="color" id="picker-panelcolor" value="#18181b" oninput="syncColor('panelcolor', this.value)" class="w-8 h-8 rounded-lg cursor-pointer border border-zinc-300">
+                                    <input type="text" name="panelcolor" id="input-panelcolor" value="#18181b" oninput="syncPicker('panelcolor', this.value)" class="w-full bg-white border border-zinc-300 rounded-lg px-2 py-1.5 text-xs text-zinc-800">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-zinc-600 mb-1">Text Color</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="color" id="picker-textcolor" value="#ffffff" oninput="syncColor('textcolor', this.value)" class="w-8 h-8 rounded-lg cursor-pointer border border-zinc-300">
+                                    <input type="text" name="textcolor" id="input-textcolor" value="#ffffff" oninput="syncPicker('textcolor', this.value)" class="w-full bg-white border border-zinc-300 rounded-lg px-2 py-1.5 text-xs text-zinc-800">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Flags -->
+                    <div class="flex items-center gap-6 text-xs font-semibold text-zinc-800">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="isNewArrival" checked class="w-4 h-4 text-black rounded">
+                            <span>Mark as New Arrival</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="isFeatured" class="w-4 h-4 text-black rounded">
+                            <span>Feature on Homepage</span>
+                        </label>
+                    </div>
+
+                    <button 
+                        type="submit" 
+                        class="w-full bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs py-4 rounded-xl uppercase tracking-wider shadow-lg transition-all"
+                    >
+                        Publish to Boutique Catalog
+                    </button>
+                </form>
+            </div>
+
+            <!-- Right: Real-Time Interactive Live Card Preview -->
+            <div class="lg:col-span-5 space-y-4 sticky top-28">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold uppercase tracking-wider text-zinc-500">Live Client View Preview</span>
+                    <span class="text-[10px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">WYSIWYG</span>
+                </div>
+
+                <!-- Preview Card -->
+                <div class="rounded-3xl overflow-hidden shadow-2xl border border-zinc-300/80 bg-white">
+                    <div id="preview-canvas" class="h-64 flex items-center justify-center p-6 relative transition-colors duration-200" style="background-color: #f4f4f5;">
+                        <span id="preview-discount-badge" class="absolute top-3 left-3 bg-rose-600 text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full shadow hidden">
+                            -10% OFF
+                        </span>
+                        <div class="text-zinc-400 text-center">
+                            <i class="ri-handbag-line text-6xl"></i>
+                            <p class="text-[10px] mt-1 font-semibold">Atelier Bag Silhouette</p>
+                        </div>
+                    </div>
+
+                    <div id="preview-panel" class="p-5 flex flex-col justify-between transition-colors duration-200" style="background-color: #18181b; color: #ffffff;">
+                        <div>
+                            <span id="preview-category" class="text-[10px] font-bold uppercase tracking-wider opacity-75 block mb-1">
+                                Tote Bags
+                            </span>
+                            <h3 id="preview-name" class="font-bold text-sm tracking-tight mb-2">
+                                New Signature Creation
+                            </h3>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-3 border-t border-white/10 mt-2">
+                            <div>
+                                <span id="preview-final-price" class="text-base font-extrabold tracking-tight">
+                                    ₹ 4,999
+                                </span>
+                                <span id="preview-mrp" class="text-xs line-through opacity-60 ml-2 hidden">
+                                    ₹ 4,999
+                                </span>
+                            </div>
+                            <span class="w-9 h-9 rounded-full bg-white text-zinc-950 flex items-center justify-center font-bold">
+                                <i class="ri-shopping-bag-line text-sm"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-xs text-zinc-400 text-center">
+                    As you edit colors and typography, this card reflects the live experience for shoppers.
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- TAB 3: Customer Orders & Dispatch Tracker -->
+    <div id="admin-tab-orders" class="<%= typeof tab === 'undefined' || tab !== 'orders' ? 'hidden' : '' %> space-y-6">
+        
+        <div class="bg-white rounded-3xl border border-zinc-200 shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-zinc-100 flex items-center justify-between">
+                <div>
+                    <h2 class="text-base font-bold text-zinc-900">All Client Orders & Dispatch Pipeline</h2>
+                    <p class="text-xs text-zinc-500">Update fulfillment status and monitor delivery commitments.</p>
+                </div>
+            </div>
+
+            <% if (orders && orders.length > 0) { %>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-zinc-50 text-zinc-500 uppercase tracking-wider text-[10px] border-b border-zinc-200">
+                            <tr>
+                                <th class="p-4 pl-6">Order ID & Date</th>
+                                <th class="p-4">Customer</th>
+                                <th class="p-4">Items</th>
+                                <th class="p-4">Total Amount</th>
+                                <th class="p-4">Status & Update</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-zinc-100 font-medium">
+                            <% orders.forEach(function(ord) { %>
+                                <tr class="hover:bg-zinc-50/80 transition-colors">
+                                    <td class="p-4 pl-6">
+                                        <span class="font-extrabold text-zinc-900 block">#<%= ord.orderId %></span>
+                                        <span class="text-[10px] text-zinc-400">
+                                            <%= new Date(ord.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) %>
+                                        </span>
+                                    </td>
+                                    <td class="p-4">
+                                        <span class="font-bold text-zinc-900 block"><%= ord.userName || ord.shippingAddress.fullname %></span>
+                                        <span class="text-zinc-500 text-[11px]"><%= ord.userEmail || ord.shippingAddress.phone %></span>
+                                    </td>
+                                    <td class="p-4 text-zinc-700">
+                                        <span class="font-bold"><%= ord.items.length %> pieces</span>
+                                        <span class="text-[10px] text-zinc-400 block truncate max-w-xs">
+                                            <%= ord.items.map(i => i.name + ' (x' + i.quantity + ')').join(', ') %>
+                                        </span>
+                                    </td>
+                                    <td class="p-4">
+                                        <span class="font-black text-sm text-zinc-900">₹ <%= ord.totalAmount.toLocaleString('en-IN') %></span>
+                                        <span class="text-[10px] text-zinc-400 block"><%= ord.paymentMethod %></span>
+                                    </td>
+                                    <td class="p-4">
+                                        <!-- Inline status updater form -->
+                                        <form action="/owners/order-status/<%= ord.orderId %>" method="POST" class="flex items-center gap-2">
+                                            <select 
+                                                name="status" 
+                                                onchange="this.form.submit()"
+                                                class="bg-zinc-100 border border-zinc-300 text-xs font-bold rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-zinc-900 cursor-pointer"
+                                            >
+                                                <option value="Confirmed" <%= ord.status === 'Confirmed' ? 'selected' : '' %>>Confirmed</option>
+                                                <option value="Processing" <%= ord.status === 'Processing' ? 'selected' : '' %>>Processing</option>
+                                                <option value="Shipped" <%= ord.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                                                <option value="Delivered" <%= ord.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                                                <option value="Cancelled" <%= ord.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                                            </select>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } else { %>
+                <div class="p-12 text-center text-zinc-400 text-xs">
+                    No orders have been placed by clients yet.
+                </div>
+            <% } %>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    function switchAdminTab(tabName) {
+        document.getElementById('admin-tab-products').classList.add('hidden');
+        document.getElementById('admin-tab-create').classList.add('hidden');
+        document.getElementById('admin-tab-orders').classList.add('hidden');
+
+        const activeContent = document.getElementById('admin-tab-' + tabName);
+        if (activeContent) activeContent.classList.remove('hidden');
+
+        // Update button states
+        ['products', 'create', 'orders'].forEach(t => {
+            const btn = document.getElementById('tab-btn-' + t);
+            if (t === tabName) {
+                btn.className = "px-5 py-2.5 rounded-full text-xs font-bold transition-all bg-zinc-900 text-white shadow-md";
+            } else {
+                btn.className = "px-5 py-2.5 rounded-full text-xs font-bold transition-all bg-zinc-100 text-zinc-700 hover:bg-zinc-200";
+            }
+        });
+    }
+
+    function syncColor(type, val) {
+        document.getElementById('input-' + type).value = val;
+        updatePreview();
+    }
+
+    function syncPicker(type, val) {
+        if (/^#[0-9A-F]{6}$/i.test(val)) {
+            document.getElementById('picker-' + type).value = val;
+        }
+        updatePreview();
+    }
+
+    function updatePreview() {
+        const name = document.getElementById('input-name').value || 'New Signature Creation';
+        const price = Number(document.getElementById('input-price').value) || 4999;
+        const discount = Number(document.getElementById('input-discount').value) || 0;
+        const category = document.getElementById('input-category').value;
+        const bgcolor = document.getElementById('input-bgcolor').value || '#f4f4f5';
+        const panelcolor = document.getElementById('input-panelcolor').value || '#18181b';
+        const textcolor = document.getElementById('input-textcolor').value || '#ffffff';
+
+        document.getElementById('preview-name').innerText = name;
+        document.getElementById('preview-category').innerText = category;
+        document.getElementById('preview-canvas').style.backgroundColor = bgcolor;
+        document.getElementById('preview-panel').style.backgroundColor = panelcolor;
+        document.getElementById('preview-panel').style.color = textcolor;
+
+        const finalPrice = Math.max(0, price - discount);
+        document.getElementById('preview-final-price').innerText = '₹ ' + finalPrice.toLocaleString('en-IN');
+
+        const mrpEl = document.getElementById('preview-mrp');
+        const badgeEl = document.getElementById('preview-discount-badge');
+
+        if (discount > 0 && price > 0) {
+            mrpEl.classList.remove('hidden');
+            mrpEl.innerText = '₹ ' + price.toLocaleString('en-IN');
+            const pct = Math.round((discount / price) * 100);
+            badgeEl.classList.remove('hidden');
+            badgeEl.innerText = '-' + pct + '% OFF';
+        } else {
+            mrpEl.classList.add('hidden');
+            badgeEl.classList.add('hidden');
+        }
+    }
+</script>
+
+<%- include('./partials/footer') %>

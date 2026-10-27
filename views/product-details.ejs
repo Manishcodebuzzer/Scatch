@@ -1,0 +1,333 @@
+<%- include('./partials/header') %>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- Breadcrumb Navigation -->
+    <nav class="flex items-center gap-2 text-xs text-zinc-500 mb-8">
+        <a href="/" class="hover:text-black">Home</a>
+        <i class="ri-arrow-right-s-line text-zinc-400"></i>
+        <a href="/shop" class="hover:text-black">Shop All</a>
+        <i class="ri-arrow-right-s-line text-zinc-400"></i>
+        <a href="/shop?category=<%= encodeURIComponent(product.category) %>" class="hover:text-black"><%= product.category %></a>
+        <i class="ri-arrow-right-s-line text-zinc-400"></i>
+        <span class="text-zinc-900 font-bold truncate"><%= product.name %></span>
+    </nav>
+
+    <!-- Main Product Showcase Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        
+        <!-- Left: Image & Palette Showcase -->
+        <div class="lg:col-span-7 space-y-6">
+            <% 
+               const finalPrice = Math.max(0, product.price - (product.discount || 0));
+               const discountPercentage = product.discount && product.price > 0 ? Math.round((product.discount / product.price) * 100) : 0;
+               const panelBg = product.panelcolor || product.panecolor || '#18181b';
+               const textColor = product.textcolor || '#ffffff';
+               const bgBackdrop = product.bgcolor || '#f4f4f5';
+            %>
+
+            <div class="relative w-full h-[450px] sm:h-[520px] rounded-3xl p-10 flex items-center justify-center shadow-lg border border-zinc-200/80 overflow-hidden" style="background-color: <%= bgBackdrop %>;">
+                
+                <!-- Floating Discount Tag -->
+                <% if (product.discount && product.discount > 0) { %>
+                    <div class="absolute top-6 left-6 bg-rose-600 text-white text-xs font-black px-3.5 py-1.5 rounded-full shadow-lg">
+                        SAVE ₹<%= product.discount.toLocaleString('en-IN') %> (-<%= discountPercentage %>%)
+                    </div>
+                <% } %>
+
+                <!-- Large Bag Image -->
+                <% if (product.image && product.image.length > 0) { %>
+                    <% 
+                       let imgStr = product.image.toString('utf8');
+                       let isSvg = imgStr.trim().startsWith('<svg');
+                       let mimeType = isSvg ? 'image/svg+xml' : 'image/jpeg';
+                    %>
+                    <img 
+                        class="max-h-[380px] max-w-full object-contain filter drop-shadow-2xl transition-transform duration-500 hover:scale-105"
+                        src="data:<%= mimeType %>;base64,<%= product.image.toString('base64') %>"
+                        alt="<%= product.name %>"
+                    >
+                <% } else { %>
+                    <div class="w-48 h-48 rounded-3xl bg-zinc-200 flex items-center justify-center text-zinc-400">
+                        <i class="ri-handbag-line text-7xl"></i>
+                    </div>
+                <% } %>
+
+                <!-- Palette Swatches Info Overlay -->
+                <div class="absolute bottom-6 left-6 flex items-center gap-2 bg-white/80 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-zinc-200 shadow-sm text-[11px] font-semibold text-zinc-700">
+                    <span>Signature Palette:</span>
+                    <span class="w-4 h-4 rounded-full border border-black/20" style="background-color: <%= bgBackdrop %>;" title="Backdrop Color"></span>
+                    <span class="w-4 h-4 rounded-full border border-black/20" style="background-color: <%= panelBg %>;" title="Panel Color"></span>
+                    <span class="w-4 h-4 rounded-full border border-black/20" style="background-color: <%= textColor %>;" title="Text Accents"></span>
+                </div>
+            </div>
+
+            <!-- Trust Guarantee Cards -->
+            <div class="grid grid-cols-3 gap-4 pt-4">
+                <div class="p-4 bg-zinc-50 rounded-2xl border border-zinc-200/80 text-center space-y-1">
+                    <i class="ri-shield-star-line text-2xl text-amber-600"></i>
+                    <p class="text-xs font-bold text-zinc-900">Lifetime Warranty</p>
+                    <p class="text-[10px] text-zinc-500">Brass hardware & seams</p>
+                </div>
+                <div class="p-4 bg-zinc-50 rounded-2xl border border-zinc-200/80 text-center space-y-1">
+                    <i class="ri-truck-line text-2xl text-amber-600"></i>
+                    <p class="text-xs font-bold text-zinc-900">Express Delivery</p>
+                    <p class="text-[10px] text-zinc-500">Complimentary over ₹1,500</p>
+                </div>
+                <div class="p-4 bg-zinc-50 rounded-2xl border border-zinc-200/80 text-center space-y-1">
+                    <i class="ri-arrow-go-back-line text-2xl text-amber-600"></i>
+                    <p class="text-xs font-bold text-zinc-900">14-Day Returns</p>
+                    <p class="text-[10px] text-zinc-500">Unconditional atelier policy</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Purchase Details & Actions -->
+        <div class="lg:col-span-5 space-y-6">
+            
+            <div>
+                <!-- Category & Star Rating -->
+                <div class="flex items-center justify-between gap-2 mb-2">
+                    <span class="text-xs font-bold uppercase tracking-widest text-amber-600">
+                        <%= product.category %>
+                    </span>
+                    <div class="flex items-center gap-1.5 bg-amber-50 px-2.5 py-1 rounded-full text-xs font-bold text-amber-900">
+                        <i class="ri-star-fill text-amber-500"></i>
+                        <span><%= product.rating || 4.8 %></span>
+                        <span class="text-amber-700/60 font-normal">(<%= product.reviews ? product.reviews.length : 0 %> reviews)</span>
+                    </div>
+                </div>
+
+                <h1 class="luxury-serif text-3xl sm:text-4xl font-extrabold text-zinc-900 tracking-tight leading-tight">
+                    <%= product.name %>
+                </h1>
+            </div>
+
+            <!-- Price Breakdown -->
+            <div class="p-5 rounded-2xl bg-zinc-50 border border-zinc-200 space-y-2">
+                <div class="flex items-baseline gap-3">
+                    <span class="text-3xl font-extrabold text-zinc-900">
+                        ₹ <%= finalPrice.toLocaleString('en-IN') %>
+                    </span>
+                    <% if (product.discount && product.discount > 0) { %>
+                        <span class="text-base text-zinc-400 line-through">
+                            ₹ <%= product.price.toLocaleString('en-IN') %>
+                        </span>
+                        <span class="text-xs font-bold text-emerald-600 bg-emerald-100 px-2.5 py-0.5 rounded-full">
+                            Save ₹<%= product.discount.toLocaleString('en-IN') %>
+                        </span>
+                    <% } %>
+                </div>
+                <p class="text-[11px] text-zinc-500">Inclusive of all duties, atelier craftsmanship, and luxury dust cover.</p>
+            </div>
+
+            <!-- Stock Availability -->
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full <%= product.stock > 0 ? 'bg-emerald-500 animate-pulse' : 'bg-red-500' %>"></span>
+                <span class="text-xs font-semibold <%= product.stock > 0 ? 'text-emerald-800' : 'text-red-600' %>">
+                    <%= product.stock > 0 ? (product.stock <= 5 ? `Limited Stock: Only ${product.stock} units remaining` : 'In Stock & Ready for Dispatch') : 'Sold Out' %>
+                </span>
+            </div>
+
+            <!-- Description -->
+            <div>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-900 mb-2">Description</h3>
+                <p class="text-xs sm:text-sm text-zinc-600 leading-relaxed">
+                    <%= product.description || 'Handcrafted from full-grain Tuscan calfskin leather with polished brass hardware. Features a dual-compartment interior and protective metal feet.' %>
+                </p>
+            </div>
+
+            <!-- Specifications Table -->
+            <div class="border-t border-b border-zinc-200 py-4 space-y-2 text-xs">
+                <div class="flex justify-between py-1">
+                    <span class="text-zinc-500">Material</span>
+                    <span class="font-semibold text-zinc-900">Full-grain vegetable-tanned leather</span>
+                </div>
+                <div class="flex justify-between py-1">
+                    <span class="text-zinc-500">Hardware</span>
+                    <span class="font-semibold text-zinc-900">Hand-burnished solid brass latches</span>
+                </div>
+                <div class="flex justify-between py-1">
+                    <span class="text-zinc-500">Origin</span>
+                    <span class="font-semibold text-zinc-900">Firenze, Italy Atelier</span>
+                </div>
+                <div class="flex justify-between py-1">
+                    <span class="text-zinc-500">Interior Lining</span>
+                    <span class="font-semibold text-zinc-900">Reinforced water-resistant canvas</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons: Add to Bag & Buy Now -->
+            <div class="space-y-3 pt-2">
+                <div class="flex items-center gap-3">
+                    <a 
+                        href="/cart/add/<%= product._id %>"
+                        class="flex-1 bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs py-4 rounded-2xl flex items-center justify-center gap-2 uppercase tracking-wider shadow-xl transition-all duration-200 active:scale-98"
+                    >
+                        <i class="ri-shopping-bag-3-line text-base"></i>
+                        Add to Shopping Bag
+                    </a>
+
+                    <!-- Wishlist Toggle -->
+                    <a 
+                        href="/wishlist/toggle/<%= product._id %>"
+                        title="Save to Wishlist"
+                        class="w-14 h-14 rounded-2xl border border-zinc-300 hover:border-zinc-900 bg-white text-zinc-700 hover:text-rose-600 flex items-center justify-center text-xl transition-colors shadow-sm"
+                    >
+                        <i class="ri-heart-3-line"></i>
+                    </a>
+                </div>
+
+                <a 
+                    href="/cart/add/<%= product._id %>?redirect=cart"
+                    class="w-full bg-amber-500 hover:bg-amber-400 text-zinc-950 font-extrabold text-xs py-4 rounded-2xl flex items-center justify-center gap-2 uppercase tracking-wider shadow-lg transition-all duration-200 block text-center"
+                >
+                    Instant Checkout &rarr;
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Customer Reviews & Rating Form Section -->
+    <div class="mt-20 pt-12 border-t border-zinc-200">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            
+            <!-- Left: Reviews List -->
+            <div class="lg:col-span-7 space-y-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-2xl font-bold text-zinc-900">Client Reviews</h2>
+                        <p class="text-xs text-zinc-500 mt-0.5">Verified reflections from owners worldwide.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-3xl font-extrabold text-zinc-900"><%= product.rating || 4.8 %></span>
+                        <div class="text-amber-500 text-sm">
+                            <i class="ri-star-fill"></i>
+                            <i class="ri-star-fill"></i>
+                            <i class="ri-star-fill"></i>
+                            <i class="ri-star-fill"></i>
+                            <i class="ri-star-half-fill"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review Items -->
+                <% if (product.reviews && product.reviews.length > 0) { %>
+                    <div class="space-y-4">
+                        <% product.reviews.forEach(function(rev) { %>
+                            <div class="p-5 rounded-2xl bg-zinc-50 border border-zinc-200/80 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-7 h-7 rounded-full bg-zinc-900 text-white flex items-center justify-center text-xs font-bold uppercase">
+                                            <%= rev.name ? rev.name.charAt(0) : 'V' %>
+                                        </div>
+                                        <span class="text-xs font-bold text-zinc-900"><%= rev.name %></span>
+                                        <span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold">Verified Client</span>
+                                    </div>
+                                    <div class="flex text-amber-500 text-xs">
+                                        <% for(let i=0; i< (rev.rating || 5); i++) { %>
+                                            <i class="ri-star-fill"></i>
+                                        <% } %>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-zinc-600 leading-relaxed italic">
+                                    "<%= rev.comment %>"
+                                </p>
+                            </div>
+                        <% }) %>
+                    </div>
+                <% } else { %>
+                    <div class="p-8 text-center bg-zinc-50 rounded-2xl border border-zinc-200 text-zinc-500 text-xs">
+                        Be the first distinguished patron to review this piece.
+                    </div>
+                <% } %>
+            </div>
+
+            <!-- Right: Submit Review Form -->
+            <div class="lg:col-span-5 bg-white p-8 rounded-3xl border border-zinc-200 shadow-md">
+                <h3 class="text-lg font-bold text-zinc-900 mb-1">Leave Your Impression</h3>
+                <p class="text-xs text-zinc-500 mb-6">Share your appraisal of the leather finish and handling.</p>
+
+                <form action="/products/<%= product._id %>/review" method="POST" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-700 mb-1">Rating</label>
+                        <select name="rating" class="w-full bg-zinc-50 border border-zinc-300 rounded-xl px-3 py-2.5 text-xs text-zinc-900 focus:outline-none focus:border-zinc-900 font-semibold">
+                            <option value="5">★★★★★ (5/5) Masterpiece Craftsmanship</option>
+                            <option value="4">★★★★☆ (4/5) Exceptional Quality</option>
+                            <option value="3">★★★☆☆ (3/5) Satisfactory</option>
+                            <option value="2">★★☆☆☆ (2/5) Modest</option>
+                            <option value="1">★☆☆☆☆ (1/5) Needs Improvement</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-700 mb-1">Your Written Review</label>
+                        <textarea 
+                            name="comment" 
+                            rows="4" 
+                            required 
+                            placeholder="Detail your appreciation of the grain, zipper glide, and weight..."
+                            class="w-full bg-zinc-50 border border-zinc-300 rounded-xl p-3 text-xs text-zinc-900 focus:outline-none focus:border-zinc-900 placeholder:text-zinc-400"
+                        ></textarea>
+                    </div>
+
+                    <button 
+                        type="submit" 
+                        class="w-full bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-xs py-3 rounded-xl uppercase tracking-wider transition-colors shadow-md"
+                    >
+                        Publish Review
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Related Products -->
+    <% if (typeof relatedProducts !== 'undefined' && relatedProducts && relatedProducts.length > 0) { %>
+        <div class="mt-20 pt-12 border-t border-zinc-200">
+            <h2 class="luxury-serif text-2xl font-bold text-zinc-900 mb-8">Complementary Atelier Creations</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <% relatedProducts.forEach(function(rel) { %>
+                    <% 
+                       const relFinalPrice = Math.max(0, rel.price - (rel.discount || 0));
+                       const relPanelBg = rel.panelcolor || rel.panecolor || '#18181b';
+                       const relTextColor = rel.textcolor || '#ffffff';
+                       const relBgBackdrop = rel.bgcolor || '#f4f4f5';
+                    %>
+                    <div class="group rounded-3xl overflow-hidden border border-zinc-200 bg-white shadow-sm hover:shadow-lg transition-all duration-300">
+                        <div class="h-44 p-4 flex items-center justify-center" style="background-color: <%= relBgBackdrop %>;">
+                            <% if (rel.image && rel.image.length > 0) { %>
+                                <% 
+                                   let isRelSvg = rel.image.toString('utf8').trim().startsWith('<svg');
+                                   let relMime = isRelSvg ? 'image/svg+xml' : 'image/jpeg';
+                                %>
+                                <img 
+                                    class="max-h-36 max-w-full object-contain drop-shadow group-hover:scale-105 transition-transform" 
+                                    src="data:<%= relMime %>;base64,<%= rel.image.toString('base64') %>" 
+                                    alt="<%= rel.name %>"
+                                >
+                            <% } %>
+                        </div>
+                        <div class="p-4" style="background-color: <%= relPanelBg %>; color: <%= relTextColor %>;">
+                            <a href="/products/<%= rel._id %>">
+                                <h4 class="text-xs font-bold truncate mb-1"><%= rel.name %></h4>
+                            </a>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-extrabold">₹ <%= relFinalPrice.toLocaleString('en-IN') %></span>
+                                <a href="/cart/add/<%= rel._id %>" class="w-7 h-7 rounded-full bg-white text-zinc-950 flex items-center justify-center text-xs font-bold hover:scale-110 transition-transform">
+                                    <i class="ri-add-line"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+    <% } %>
+
+</div>
+
+<%- include('./partials/footer') %>

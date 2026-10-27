@@ -1,8 +1,16 @@
-const express=require("express");
-const router=express.Router();
+const express = require("express");
+const router = express.Router();
+const isLoggedin = require("../middlewares/isLoggedin");
+const {
+  registerUser,
+  loginUser,
+  logout,
+  updateProfile,
+} = require("../controllers/authController");
 
-router.get("/",(req,res)=>{
-   res.send("Hii i am User")
-});
+router.post("/register", registerUser);
+router.post("/login", loginUser);
+router.get("/logout", logout);
+router.post("/profile", isLoggedin, updateProfile);
 
-module.exports=router;
+module.exports = router;

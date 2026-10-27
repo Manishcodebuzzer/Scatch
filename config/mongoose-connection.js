@@ -1,12 +1,20 @@
-const mongoose=require("mongoose");
+const mongoose = require("mongoose");
+const config = require("config");
+const dbgr = require("debug")("development:mongoose");
+const { seedProductsIfNeeded, ensureAdminExists } = require("../utils/seedProducts");
 
 mongoose
-.connect('mongodb://127.0.0.1:27017/scatch')
-.then(function(){
-    console.log("Connected");
-})
-.catch(function(err){
-    console.log(err);
-})
+  .connect(`${config.get("MONGODB_URI")}/scatch`)
+  .then(async function () {
+    dbgr("Connected");
+    console.log("MongoDB connected to Scatch database.");
+    await seedProductsIfNeeded();
+    await ensureAdminExists();
+  })
 
-module.exports=mongoose.connection;
+  .catch(function (err) {
+    dbgr(err);
+    console.error("MongoDB connection error:", err.message);
+  });
+
+module.exports = mongoose.connection;

@@ -1,0 +1,241 @@
+<%- include('./partials/header') %>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    
+    <div class="flex items-center justify-between pb-6 border-b border-zinc-200 mb-8">
+        <div>
+            <span class="text-xs font-bold uppercase tracking-widest text-amber-600 block mb-1">
+                Checkout Summary
+            </span>
+            <h1 class="luxury-serif text-3xl font-extrabold text-zinc-900 tracking-tight">
+                Your Shopping Bag
+            </h1>
+        </div>
+        <a href="/shop" class="text-xs font-bold text-zinc-600 hover:text-black flex items-center gap-1">
+            <i class="ri-arrow-left-line"></i> Continue Shopping
+        </a>
+    </div>
+
+    <% if (cartItems && cartItems.length > 0) { %>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+            
+            <!-- Left: Cart Items List -->
+            <div class="lg:col-span-8 space-y-4">
+                <% cartItems.forEach(function(item) { %>
+                    <% 
+                       const p = item.product;
+                       if (!p) return;
+                       const qty = item.quantity || 1;
+                       const finalUnitPrice = Math.max(0, p.price - (p.discount || 0));
+                       const itemTotal = finalUnitPrice * qty;
+                       const bgBackdrop = p.bgcolor || '#f4f4f5';
+                       const panelBg = p.panelcolor || p.panecolor || '#18181b';
+                       const textColor = p.textcolor || '#ffffff';
+                    %>
+
+                    <div class="bg-white rounded-3xl p-5 border border-zinc-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6 hover:shadow-md transition-shadow">
+                        
+                        <!-- Thumbnail & Basic Info -->
+                        <div class="flex items-center gap-5 w-full sm:w-auto">
+                            <div class="w-24 h-24 rounded-2xl flex-shrink-0 flex items-center justify-center p-2 border border-zinc-200" style="background-color: <%= bgBackdrop %>;">
+                                <% if (p.image && p.image.length > 0) { %>
+                                    <% 
+                                       let isSvg = p.image.toString('utf8').trim().startsWith('<svg');
+                                       let mime = isSvg ? 'image/svg+xml' : 'image/jpeg';
+                                    %>
+                                    <img 
+                                        class="max-h-20 max-w-full object-contain drop-shadow" 
+                                        src="data:<%= mime %>;base64,<%= p.image.toString('base64') %>" 
+                                        alt="<%= p.name %>"
+                                    >
+                                <% } else { %>
+                                    <i class="ri-handbag-line text-3xl text-zinc-400"></i>
+                                <% } %>
+                            </div>
+
+                            <div class="space-y-1">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600">
+                                    <%= p.category || 'Atelier Bag' %>
+                                </span>
+                                <a href="/products/<%= p._id %>" class="block hover:underline">
+                                    <h3 class="text-sm sm:text-base font-bold text-zinc-900 tracking-tight">
+                                        <%= p.name %>
+                                    </h3>
+                                </a>
+                                <div class="flex items-center gap-2 text-xs">
+                                    <span class="font-extrabold text-zinc-900">₹ <%= finalUnitPrice.toLocaleString('en-IN') %></span>
+                                    <% if (p.discount && p.discount > 0) { %>
+                                        <span class="text-zinc-400 line-through text-[11px]">₹ <%= p.price.toLocaleString('en-IN') %></span>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quantity Selector & Actions -->
+                        <div class="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t sm:border-t-0 pt-3 sm:pt-0 border-zinc-100">
+                            
+                            <!-- Quantity Controls -->
+                            <div class="flex items-center border border-zinc-300 rounded-full bg-zinc-50 p-1">
+                                <a 
+                                    href="/cart/decrease/<%= p._id %>" 
+                                    class="w-7 h-7 rounded-full bg-white hover:bg-zinc-200 text-zinc-800 flex items-center justify-center font-bold text-xs shadow-sm transition-colors"
+                                    title="Decrease quantity"
+                                >
+                                    <i class="ri-subtract-line"></i>
+                                </a>
+                                <span class="w-8 text-center text-xs font-bold text-zinc-900">
+                                    <%= qty.toString().padStart(2, '0') %>
+                                </span>
+                                <a 
+                                    href="/cart/increase/<%= p._id %>" 
+                                    class="w-7 h-7 rounded-full bg-white hover:bg-zinc-200 text-zinc-800 flex items-center justify-center font-bold text-xs shadow-sm transition-colors"
+                                    title="Increase quantity"
+                                >
+                                    <i class="ri-add-line"></i>
+                                </a>
+                            </div>
+
+                            <!-- Item Net Total -->
+                            <div class="text-right min-w-[90px]">
+                                <span class="text-xs text-zinc-400 block text-[10px] uppercase font-bold">Subtotal</span>
+                                <span class="text-sm font-extrabold text-zinc-900">
+                                    ₹ <%= itemTotal.toLocaleString('en-IN') %>
+                                </span>
+                            </div>
+
+                            <!-- Remove Button -->
+                            <a 
+                                href="/cart/remove/<%= p._id %>" 
+                                title="Remove from bag"
+                                class="text-zinc-400 hover:text-red-600 transition-colors p-2"
+                            >
+                                <i class="ri-delete-bin-line text-lg"></i>
+                            </a>
+
+                        </div>
+
+                    </div>
+                <% }) %>
+            </div>
+
+            <!-- Right: Price Breakdown & Coupon -->
+            <div class="lg:col-span-4 space-y-6">
+                
+                <!-- Coupon Code Card -->
+                <div class="bg-white rounded-3xl p-6 border border-zinc-200 shadow-sm space-y-3">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-900 flex items-center gap-1.5">
+                        <i class="ri-coupon-3-line text-amber-600 text-sm"></i>
+                        Privé Promotional Code
+                    </h3>
+
+                    <% if (coupon) { %>
+                        <div class="flex items-center justify-between p-3 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-800 font-semibold">
+                            <div class="flex items-center gap-2">
+                                <i class="ri-checkbox-circle-fill text-emerald-600 text-base"></i>
+                                <span>Code <strong><%= coupon.code %></strong> (-₹<%= coupon.discountAmount %>)</span>
+                            </div>
+                            <a href="/cart/remove-coupon" class="text-emerald-700 hover:text-emerald-950 font-bold underline text-[11px]">Remove</a>
+                        </div>
+                    <% } else { %>
+                        <form action="/cart/coupon" method="POST" class="flex gap-2">
+                            <input 
+                                type="text" 
+                                name="code" 
+                                placeholder="e.g. SCATCH10" 
+                                required
+                                class="flex-grow bg-zinc-50 border border-zinc-300 focus:border-zinc-900 rounded-xl px-3 py-2.5 text-xs text-zinc-900 font-bold uppercase focus:outline-none placeholder:normal-case placeholder:font-normal"
+                            >
+                            <button type="submit" class="bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl uppercase transition-colors">
+                                Apply
+                            </button>
+                        </form>
+                        <p class="text-[10px] text-zinc-400">Available: Use <strong class="text-zinc-700">SCATCH10</strong> for 10% off or <strong class="text-zinc-700">WELCOME500</strong> for ₹500 off.</p>
+                    <% } %>
+                </div>
+
+                <!-- Order Financial Summary -->
+                <div class="bg-white rounded-3xl p-6 border border-zinc-200 shadow-lg space-y-4">
+                    <h3 class="text-sm font-bold text-zinc-900 uppercase tracking-wider border-b border-zinc-100 pb-3">
+                        Order Summary
+                    </h3>
+
+                    <div class="space-y-2.5 text-xs">
+                        <div class="flex justify-between text-zinc-600">
+                            <span>Total MRP (<%= cartItems.reduce((acc, c) => acc + (c.quantity||1), 0) %> items)</span>
+                            <span class="font-semibold text-zinc-900">₹ <%= totalMRP.toLocaleString('en-IN') %></span>
+                        </div>
+
+                        <div class="flex justify-between text-zinc-600">
+                            <span>Catalog Discount</span>
+                            <span class="font-semibold text-emerald-600">- ₹ <%= totalDiscount.toLocaleString('en-IN') %></span>
+                        </div>
+
+                        <% if (couponDiscount > 0) { %>
+                            <div class="flex justify-between text-zinc-600">
+                                <span>Coupon Discount (<%= coupon.code %>)</span>
+                                <span class="font-semibold text-emerald-600">- ₹ <%= couponDiscount.toLocaleString('en-IN') %></span>
+                            </div>
+                        <% } %>
+
+                        <div class="flex justify-between text-zinc-600">
+                            <span>Platform Fee</span>
+                            <span class="font-semibold text-zinc-900">₹ <%= platformFee %></span>
+                        </div>
+
+                        <div class="flex justify-between text-zinc-600">
+                            <span>Atelier Delivery</span>
+                            <span class="font-semibold <%= shippingFee === 0 ? 'text-emerald-600' : 'text-zinc-900' %>">
+                                <%= shippingFee === 0 ? 'COMPLIMENTARY' : '₹ ' + shippingFee %>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 border-t border-zinc-200 flex items-baseline justify-between">
+                        <div>
+                            <span class="text-xs uppercase font-extrabold text-zinc-500 block">Total Amount</span>
+                            <span class="text-[10px] text-zinc-400">All duties & taxes included</span>
+                        </div>
+                        <span class="text-2xl font-black text-zinc-900">
+                            ₹ <%= netTotal.toLocaleString('en-IN') %>
+                        </span>
+                    </div>
+
+                    <!-- Proceed to Checkout Button -->
+                    <a 
+                        href="/checkout" 
+                        class="w-full bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs py-4 rounded-2xl flex items-center justify-center gap-2 uppercase tracking-wider shadow-xl transition-all duration-200 block text-center"
+                    >
+                        <span>Proceed to Secure Checkout</span>
+                        <i class="ri-arrow-right-line"></i>
+                    </a>
+
+                    <div class="pt-2 flex items-center justify-center gap-4 text-[10px] text-zinc-400">
+                        <span class="flex items-center gap-1"><i class="ri-lock-line"></i> 256-Bit SSL</span>
+                        <span class="flex items-center gap-1"><i class="ri-shield-check-line"></i> Atelier Guaranteed</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    <% } else { %>
+        <!-- Empty Cart State -->
+        <div class="py-24 text-center max-w-md mx-auto">
+            <div class="w-24 h-24 bg-zinc-100 rounded-full flex items-center justify-center mx-auto text-zinc-400 mb-6">
+                <i class="ri-shopping-bag-3-line text-5xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-zinc-900 mb-2">Your Shopping Bag is Empty</h2>
+            <p class="text-xs sm:text-sm text-zinc-500 mb-8 leading-relaxed">
+                Discover our signature handcrafted leather creations, totes, backpacks, and weekend duffles designed for the modern connoisseur.
+            </p>
+            <a href="/shop" class="inline-flex items-center gap-2 px-8 py-3.5 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-lg transition-all duration-200">
+                <span>Explore the Collection</span>
+                <i class="ri-arrow-right-line"></i>
+            </a>
+        </div>
+    <% } %>
+
+</div>
+
+<%- include('./partials/footer') %>

@@ -1,0 +1,226 @@
+<%- include('./partials/header') %>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    
+    <!-- Top Hero Banner / Catalog Header -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-zinc-200">
+        <div>
+            <span class="text-xs font-bold uppercase tracking-widest text-amber-600 block mb-1">
+                Atelier Collection
+            </span>
+            <h1 class="luxury-serif text-3xl sm:text-4xl font-extrabold text-zinc-900 tracking-tight">
+                Architectural Leather Bags
+            </h1>
+            <p class="text-xs sm:text-sm text-zinc-500 mt-2 max-w-xl">
+                Explore handcrafted totes, weekender duffles, and urban backpacks designed with full-grain Tuscan hides.
+            </p>
+        </div>
+
+        <!-- Sort & Count Controls -->
+        <div class="flex items-center gap-4">
+            <span class="text-xs font-semibold text-zinc-500">
+                <strong class="text-zinc-900 font-bold"><%= products.length %></strong> Pieces Found
+            </span>
+
+            <form action="/shop" method="GET" class="flex items-center gap-2">
+                <% if (typeof activeCategory !== 'undefined' && activeCategory !== 'All') { %>
+                    <input type="hidden" name="category" value="<%= activeCategory %>">
+                <% } %>
+                <% if (typeof activeSearch !== 'undefined' && activeSearch) { %>
+                    <input type="hidden" name="search" value="<%= activeSearch %>">
+                <% } %>
+                <% if (typeof activeFilter !== 'undefined' && activeFilter) { %>
+                    <input type="hidden" name="filter" value="<%= activeFilter %>">
+                <% } %>
+
+                <select 
+                    name="sortby" 
+                    onchange="this.form.submit()" 
+                    class="bg-white border border-zinc-300 text-xs font-semibold text-zinc-800 rounded-xl px-3 py-2.5 focus:outline-none focus:border-zinc-900 shadow-sm cursor-pointer"
+                >
+                    <option value="popular" <%= typeof activeSort !== 'undefined' && activeSort === 'popular' ? 'selected' : '' %>>Most Popular</option>
+                    <option value="newest" <%= typeof activeSort !== 'undefined' && activeSort === 'newest' ? 'selected' : '' %>>Newest First</option>
+                    <option value="price_asc" <%= typeof activeSort !== 'undefined' && activeSort === 'price_asc' ? 'selected' : '' %>>Price: Low to High</option>
+                    <option value="price_desc" <%= typeof activeSort !== 'undefined' && activeSort === 'price_desc' ? 'selected' : '' %>>Price: High to Low</option>
+                    <option value="discount" <%= typeof activeSort !== 'undefined' && activeSort === 'discount' ? 'selected' : '' %>>Highest Discount</option>
+                </select>
+            </form>
+        </div>
+    </div>
+
+    <!-- Category Pills Filter Bar -->
+    <div class="flex items-center gap-2 overflow-x-auto py-6 no-scrollbar">
+        <a 
+            href="/shop" 
+            class="whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold transition-all <%= typeof activeCategory === 'undefined' || activeCategory === 'All' ? 'bg-zinc-900 text-white shadow-md' : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200' %>"
+        >
+            All Collections
+        </a>
+        <% if (typeof categories !== 'undefined') { %>
+            <% categories.forEach(function(cat) { %>
+                <a 
+                    href="/shop?category=<%= encodeURIComponent(cat) %><%= typeof activeSort !== 'undefined' ? '&sortby=' + activeSort : '' %>" 
+                    class="whitespace-nowrap px-4 py-2 rounded-full text-xs font-semibold transition-all <%= typeof activeCategory !== 'undefined' && activeCategory === cat ? 'bg-zinc-900 text-white shadow-md' : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200' %>"
+                >
+                    <%= cat %>
+                </a>
+            <% }) %>
+        <% } %>
+
+        <!-- Special Filter Badges -->
+        <a 
+            href="/shop?filter=new<%= typeof activeCategory !== 'undefined' && activeCategory !== 'All' ? '&category=' + encodeURIComponent(activeCategory) : '' %>" 
+            class="whitespace-nowrap px-4 py-2 rounded-full text-xs font-semibold transition-all <%= typeof activeFilter !== 'undefined' && activeFilter === 'new' ? 'bg-amber-500 text-zinc-950 font-bold' : 'bg-amber-50 text-amber-800 hover:bg-amber-100' %>"
+        >
+            <i class="ri-sparkling-line mr-1"></i> New Arrivals
+        </a>
+        <a 
+            href="/shop?filter=discount<%= typeof activeCategory !== 'undefined' && activeCategory !== 'All' ? '&category=' + encodeURIComponent(activeCategory) : '' %>" 
+            class="whitespace-nowrap px-4 py-2 rounded-full text-xs font-semibold transition-all <%= typeof activeFilter !== 'undefined' && activeFilter === 'discount' ? 'bg-rose-600 text-white font-bold' : 'bg-rose-50 text-rose-700 hover:bg-rose-100' %>"
+        >
+            <i class="ri-price-tag-3-line mr-1"></i> Discounted
+        </a>
+    </div>
+
+    <!-- Active Search Filter Callout (if active) -->
+    <% if (typeof activeSearch !== 'undefined' && activeSearch) { %>
+        <div class="mb-6 flex items-center justify-between p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900">
+            <span>Showing search results for: <strong>"<%= activeSearch %>"</strong></span>
+            <a href="/shop" class="font-bold underline hover:text-amber-950">Clear search</a>
+        </div>
+    <% } %>
+
+    <!-- Products Grid -->
+    <% if (products && products.length > 0) { %>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <% products.forEach(function(product) { %>
+                <% 
+                   const finalPrice = Math.max(0, product.price - (product.discount || 0));
+                   const discountPercentage = product.discount && product.price > 0 ? Math.round((product.discount / product.price) * 100) : 0;
+                   const panelBg = product.panelcolor || product.panecolor || '#18181b';
+                   const textColor = product.textcolor || '#ffffff';
+                   const bgBackdrop = product.bgcolor || '#f4f4f5';
+                %>
+
+                <div class="group relative flex flex-col rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-zinc-200/80 bg-white">
+                    
+                    <!-- Top Canvas Area with Dynamic Bg Color & Bag Image -->
+                    <div class="relative w-full h-64 flex items-center justify-center p-6 transition-transform duration-300 group-hover:scale-[1.02]" style="background-color: <%= bgBackdrop %>;">
+                        
+                        <!-- Badges (Discount & New) -->
+                        <div class="absolute top-3 left-3 flex flex-col gap-1 z-10">
+                            <% if (product.discount && product.discount > 0) { %>
+                                <span class="bg-rose-600 text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full shadow-md">
+                                    -<%= discountPercentage %>% OFF
+                                </span>
+                            <% } %>
+                            <% if (product.isNewArrival) { %>
+                                <span class="bg-zinc-950/80 backdrop-blur-md text-amber-300 text-[10px] font-bold px-2.5 py-1 rounded-full">
+                                    NEW
+                                </span>
+                            <% } %>
+                        </div>
+
+                        <!-- Wishlist Heart Toggle Button -->
+                        <a 
+                            href="/wishlist/toggle/<%= product._id %>" 
+                            title="Add to Wishlist"
+                            class="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white/90 hover:bg-white text-zinc-700 hover:text-rose-600 shadow-md flex items-center justify-center transition-all hover:scale-110"
+                        >
+                            <i class="ri-heart-3-line text-lg"></i>
+                        </a>
+
+                        <!-- Product Image Link -->
+                        <a href="/products/<%= product._id %>" class="w-full h-full flex items-center justify-center">
+                            <% if (product.image && product.image.length > 0) { %>
+                                <% 
+                                   let imgStr = product.image.toString('utf8');
+                                   let isSvg = imgStr.trim().startsWith('<svg');
+                                   let mimeType = isSvg ? 'image/svg+xml' : 'image/jpeg';
+                                %>
+                                <img 
+                                    class="max-h-48 max-w-full object-contain filter drop-shadow-md group-hover:drop-shadow-xl transition-all duration-300"
+                                    src="data:<%= mimeType %>;base64,<%= product.image.toString('base64') %>"
+                                    alt="<%= product.name %>"
+                                >
+                            <% } else { %>
+                                <div class="w-32 h-32 rounded-2xl bg-zinc-200/80 flex items-center justify-center text-zinc-400">
+                                    <i class="ri-handbag-line text-5xl"></i>
+                                </div>
+                            <% } %>
+                        </a>
+                    </div>
+
+                    <!-- Bottom Signature Panel -->
+                    <div 
+                        class="p-5 flex flex-col justify-between flex-grow transition-colors duration-200" 
+                        style="background-color: <%= panelBg %>; color: <%= textColor %>;"
+                    >
+                        <div>
+                            <div class="flex items-center justify-between gap-2 mb-1">
+                                <span class="text-[10px] font-bold uppercase tracking-wider opacity-75">
+                                    <%= product.category || 'Atelier Bag' %>
+                                </span>
+                                <div class="flex items-center gap-1 text-[11px] font-bold text-amber-400">
+                                    <i class="ri-star-fill text-xs"></i>
+                                    <span><%= product.rating || 4.8 %></span>
+                                </div>
+                            </div>
+
+                            <a href="/products/<%= product._id %>" class="hover:underline">
+                                <h3 class="font-bold text-sm tracking-tight line-clamp-1 mb-2">
+                                    <%= product.name %>
+                                </h3>
+                            </a>
+                        </div>
+
+                        <!-- Price & Add to Bag Footer -->
+                        <div class="flex items-center justify-between pt-3 border-t border-white/10 mt-2">
+                            <div>
+                                <div class="flex items-baseline gap-2">
+                                    <span class="text-base font-extrabold tracking-tight">
+                                        ₹ <%= finalPrice.toLocaleString('en-IN') %>
+                                    </span>
+                                    <% if (product.discount && product.discount > 0) { %>
+                                        <span class="text-xs line-through opacity-60">
+                                            ₹ <%= product.price.toLocaleString('en-IN') %>
+                                        </span>
+                                    <% } %>
+                                </div>
+                                <span class="text-[9px] font-medium opacity-70 block">
+                                    <%= product.stock > 0 ? (product.stock <= 5 ? 'Only ' + product.stock + ' left!' : 'In Stock') : 'Out of Stock' %>
+                                </span>
+                            </div>
+
+                            <!-- Direct Add to Cart Action -->
+                            <a 
+                                href="/cart/add/<%= product._id %>" 
+                                title="Add to Bag"
+                                class="w-10 h-10 rounded-full bg-white text-zinc-950 hover:bg-amber-400 hover:scale-105 active:scale-95 transition-all shadow-md flex items-center justify-center font-bold"
+                            >
+                                <i class="ri-shopping-bag-line text-base"></i>
+                            </a>
+                        </div>
+
+                    </div>
+
+                </div>
+            <% }) %>
+        </div>
+    <% } else { %>
+        <!-- Empty State When No Products Match Filters -->
+        <div class="py-20 text-center max-w-md mx-auto">
+            <div class="w-20 h-20 bg-zinc-100 rounded-full flex items-center justify-center mx-auto text-zinc-400 mb-4">
+                <i class="ri-search-eye-line text-4xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-zinc-900 mb-2">No Luxury Pieces Found</h3>
+            <p class="text-xs text-zinc-500 mb-6">We couldn't find any items matching your active category or search query.</p>
+            <a href="/shop" class="inline-block px-6 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all">
+                Reset All Filters
+            </a>
+        </div>
+    <% } %>
+
+</div>
+
+<%- include('./partials/footer') %>

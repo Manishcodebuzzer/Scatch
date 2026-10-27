@@ -1,0 +1,75 @@
+<%- include('./partials/header') %>
+
+<div class="min-h-[calc(100vh-80px)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-zinc-950 text-white">
+    <div class="max-w-md w-full space-y-8 bg-zinc-900/90 border border-zinc-800 p-8 sm:p-10 rounded-3xl shadow-2xl relative">
+        
+        <!-- Header -->
+        <div class="text-center space-y-2">
+            <div class="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto text-2xl shadow-inner">
+                <i class="ri-shield-keyhole-line"></i>
+            </div>
+            <span class="text-[10px] font-extrabold uppercase tracking-[0.25em] text-amber-400">
+                Authorized Personnel Only
+            </span>
+            <h2 class="luxury-serif text-3xl font-extrabold tracking-tight text-white">
+                Admin Suite
+            </h2>
+            <p class="text-xs text-zinc-400">
+                Log in with owner privileges to manage catalog creations, analytics, and client dispatches.
+            </p>
+        </div>
+
+        <!-- Login Form -->
+        <form action="/owners/login" method="POST" class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold text-zinc-300 mb-1">Owner Email</label>
+                <div class="relative">
+                    <input 
+                        type="email" 
+                        name="email" 
+                        required 
+                        placeholder="admin@scatch.com"
+                        class="w-full bg-zinc-800/80 border border-zinc-700 focus:border-amber-400 focus:bg-zinc-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none transition-all placeholder:text-zinc-500"
+                    >
+                    <i class="ri-mail-line absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500 text-sm"></i>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-zinc-300 mb-1">Passkey</label>
+                <div class="relative">
+                    <input 
+                        type="password" 
+                        name="password" 
+                        required 
+                        placeholder="••••••••"
+                        class="w-full bg-zinc-800/80 border border-zinc-700 focus:border-amber-400 focus:bg-zinc-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none transition-all placeholder:text-zinc-500"
+                    >
+                    <i class="ri-lock-password-line absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500 text-sm"></i>
+                </div>
+            </div>
+
+            <button 
+                type="submit" 
+                class="w-full bg-amber-400 hover:bg-amber-300 text-zinc-950 font-black text-xs py-3.5 rounded-xl uppercase tracking-wider shadow-lg transition-all duration-200 mt-2"
+            >
+                Authorize & Enter Suite
+            </button>
+        </form>
+
+        <!-- Quick Initializer Hint -->
+        <div class="p-4 bg-zinc-800/50 rounded-2xl border border-zinc-700/60 text-center space-y-1">
+            <span class="text-[11px] font-bold text-amber-400 block">Master Admin Credentials</span>
+            <p class="text-[10px] text-zinc-300">Email: <strong class="text-white font-bold">manish@gmail.com</strong> &bull; Password: <strong class="text-white font-bold">12345</strong></p>
+        </div>
+
+        <div class="text-center">
+            <a href="/shop" class="text-xs text-zinc-400 hover:text-white transition-colors">
+                &larr; Return to Client Boutique
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<%- include('./partials/footer') %>

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCATCH | Haute Maroquinerie & Luxury Bags</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        serif: ['"Playfair Display"', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            gold: '#c59b27',
+                            dark: '#09090b',
+                            zinc: '#18181b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #fafafa;
+            color: #09090b;
+        }
+        .luxury-serif {
+            font-family: 'Playfair Display', serif;
+        }
+        @keyframes slideDown {
+            from { transform: translate(-50%, -100%); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
+        .toast-animate {
+            animation: slideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col antialiased selection:bg-black selection:text-white">
+
+    <!-- Flash Notifications / Toasts -->
+    <% if (typeof error !== 'undefined' && error && error.length > 0) { %>
+        <div id="flash-error" class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] toast-animate flex items-center gap-3 px-5 py-3.5 bg-red-950/90 text-red-200 border border-red-800/80 rounded-full shadow-2xl backdrop-blur-md text-sm font-medium">
+            <i class="ri-error-warning-fill text-lg text-red-400"></i>
+            <span><%= error %></span>
+            <button onclick="this.parentElement.remove()" class="ml-2 text-red-400 hover:text-white transition-colors">
+                <i class="ri-close-line text-base"></i>
+            </button>
+        </div>
+        <script>setTimeout(() => { const el = document.getElementById('flash-error'); if(el) el.remove(); }, 5000);</script>
+    <% } %>
+
+    <% if (typeof success !== 'undefined' && success && success.length > 0) { %>
+        <div id="flash-success" class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] toast-animate flex items-center gap-3 px-5 py-3.5 bg-zinc-900/95 text-zinc-100 border border-zinc-700/80 rounded-full shadow-2xl backdrop-blur-md text-sm font-medium">
+            <i class="ri-checkbox-circle-fill text-lg text-amber-400"></i>
+            <span><%= success %></span>
+            <button onclick="this.parentElement.remove()" class="ml-2 text-zinc-400 hover:text-white transition-colors">
+                <i class="ri-close-line text-base"></i>
+            </button>
+        </div>
+        <script>setTimeout(() => { const el = document.getElementById('flash-success'); if(el) el.remove(); }, 5000);</script>
+    <% } %>
+
+    <!-- Top Announcement Bar -->
+    <div class="bg-zinc-950 text-zinc-400 text-xs tracking-wider uppercase py-2 px-6 text-center border-b border-zinc-800/60 hidden md:block">
+        <span>Complimentary Express Shipping on Orders Above ₹1,500 &bull; Use Code <strong class="text-amber-400 font-semibold tracking-normal">SCATCH10</strong> for 10% Off</span>
+    </div>
+
+    <!-- Main Navigation Header -->
+    <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-zinc-200/80 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+            
+            <!-- Logo & Brand Identity -->
+            <div class="flex items-center gap-8">
+                <a href="/" class="flex flex-col group">
+                    <span class="luxury-serif text-2xl font-bold tracking-[0.25em] text-zinc-900 group-hover:text-amber-600 transition-colors uppercase">
+                        SCATCH
+                    </span>
+                    <span class="text-[9px] uppercase tracking-[0.35em] text-zinc-400 font-semibold -mt-0.5">
+                        Haute Maroquinerie
+                    </span>
+                </a>
+
+                <!-- Desktop Navigation Links -->
+                <nav class="hidden lg:flex items-center gap-7 text-sm font-medium text-zinc-600">
+                    <a href="/shop" class="hover:text-black transition-colors <%= typeof currentPath !== 'undefined' && currentPath === '/shop' ? 'text-black font-semibold border-b-2 border-black pb-1' : '' %>">
+                        All Bags
+                    </a>
+                    <a href="/shop?category=Tote+Bags" class="hover:text-black transition-colors">
+                        Totes
+                    </a>
+                    <a href="/shop?category=Backpacks" class="hover:text-black transition-colors">
+                        Backpacks
+                    </a>
+                    <a href="/shop?category=Crossbody" class="hover:text-black transition-colors">
+                        Crossbody
+                    </a>
+                    <a href="/shop?category=Travel+Duffles" class="hover:text-black transition-colors">
+                        Travel
+                    </a>
+                    <a href="/shop?filter=discount" class="text-rose-600 hover:text-rose-700 transition-colors flex items-center gap-1 font-semibold">
+                        <span>Sale</span>
+                        <span class="text-[10px] bg-rose-100 text-rose-700 px-1.5 py-0.5 rounded-full font-bold">HOT</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Search Bar (Integrated) -->
+            <div class="hidden md:flex flex-1 max-w-xs xl:max-w-sm mx-4">
+                <form action="/shop" method="GET" class="relative w-full">
+                    <input 
+                        type="text" 
+                        name="search" 
+                        placeholder="Search Italian leather, duffles..." 
+                        value="<%= typeof activeSearch !== 'undefined' ? activeSearch : '' %>"
+                        class="w-full bg-zinc-100/80 hover:bg-zinc-100 focus:bg-white text-xs pl-10 pr-4 py-2.5 rounded-full border border-zinc-200 focus:border-zinc-800 focus:outline-none transition-all placeholder:text-zinc-400"
+                    >
+                    <i class="ri-search-line absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 text-sm"></i>
+                </form>
+            </div>
+
+            <!-- Right Action Icons & User Dropdown -->
+            <div class="flex items-center gap-2 sm:gap-4">
+
+                <!-- Wishlist Icon with Count -->
+                <a href="/wishlist" title="Wishlist" class="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-zinc-100 text-zinc-700 hover:text-zinc-950 transition-colors">
+                    <i class="ri-heart-3-line text-xl"></i>
+                    <% if (typeof wishlistCount !== 'undefined' && wishlistCount > 0) { %>
+                        <span class="absolute top-1 right-1 bg-zinc-900 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                            <%= wishlistCount %>
+                        </span>
+                    <% } %>
+                </a>
+
+                <!-- Shopping Bag / Cart Icon with Count -->
+                <a href="/cart" title="Shopping Bag" class="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-zinc-100 text-zinc-700 hover:text-zinc-950 transition-colors">
+                    <i class="ri-shopping-bag-3-line text-xl"></i>
+                    <% if (typeof cartCount !== 'undefined' && cartCount > 0) { %>
+                        <span class="absolute top-1 right-1 bg-amber-500 text-zinc-950 text-[10px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center shadow-sm">
+                            <%= cartCount %>
+                        </span>
+                    <% } %>
+                </a>
+
+                <!-- User Session Menu -->
+                <% if (typeof user !== 'undefined' && user) { %>
+                    <div class="relative group">
+                        <button class="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-full hover:bg-zinc-100 transition-colors border border-zinc-200">
+                            <div class="w-7 h-7 rounded-full bg-zinc-900 text-zinc-100 flex items-center justify-center text-xs font-bold uppercase shadow-sm">
+                                <%= user.fullname ? user.fullname.charAt(0) : 'U' %>
+                            </div>
+                            <span class="text-xs font-semibold text-zinc-800 max-w-[80px] truncate hidden sm:inline">
+                                <%= user.fullname.split(' ')[0] %>
+                            </span>
+                            <i class="ri-arrow-down-s-line text-zinc-400 text-xs"></i>
+                        </button>
+
+                        <!-- Dropdown Menu -->
+                        <div class="absolute right-0 mt-1 w-52 bg-white rounded-2xl shadow-xl border border-zinc-200 py-2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 transform origin-top-right z-50">
+                            <div class="px-4 py-2 border-b border-zinc-100">
+                                <p class="text-xs font-medium text-zinc-400">Signed in as</p>
+                                <p class="text-xs font-bold text-zinc-900 truncate"><%= user.email %></p>
+                            </div>
+                            <a href="/my-orders" class="flex items-center gap-3 px-4 py-2.5 text-xs text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950 font-medium">
+                                <i class="ri-archive-line text-zinc-400 text-sm"></i>
+                                My Orders & Tracking
+                            </a>
+                            <a href="/wishlist" class="flex items-center gap-3 px-4 py-2.5 text-xs text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950 font-medium">
+                                <i class="ri-heart-line text-zinc-400 text-sm"></i>
+                                Saved Wishlist
+                            </a>
+                            <a href="/account" class="flex items-center gap-3 px-4 py-2.5 text-xs text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950 font-medium">
+                                <i class="ri-user-3-line text-zinc-400 text-sm"></i>
+                                Profile & Addresses
+                            </a>
+                            <% if (typeof isOwner !== 'undefined' && isOwner) { %>
+                                <div class="my-1 border-t border-zinc-100"></div>
+                                <a href="/owners/admin" class="flex items-center gap-3 px-4 py-2.5 text-xs text-amber-600 hover:bg-amber-50 font-semibold">
+                                    <i class="ri-dashboard-3-line text-amber-500 text-sm"></i>
+                                    Admin Control Panel
+                                </a>
+                            <% } %>
+                            <div class="my-1 border-t border-zinc-100"></div>
+                            <a href="/logout" class="flex items-center gap-3 px-4 py-2 text-xs text-red-600 hover:bg-red-50 font-medium">
+                                <i class="ri-logout-box-r-line text-red-400 text-sm"></i>
+                                Sign Out
+                            </a>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <div class="flex items-center gap-2">
+                        <a href="/" class="text-xs font-semibold px-4 py-2 rounded-full border border-zinc-300 hover:border-zinc-900 text-zinc-800 transition-colors">
+                            Sign In
+                        </a>
+                        <a href="/owners/login" class="text-xs font-medium text-zinc-400 hover:text-zinc-800 transition-colors hidden sm:inline ml-1" title="Store Management">
+                            Admin
+                        </a>
+                    </div>
+                <% } %>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Page Content Wrapper -->
+    <main class="flex-grow">
